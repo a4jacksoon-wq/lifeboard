@@ -1,0 +1,419 @@
+
+!DOCTYPE html
+html lang=pl
+head
+meta charset=UTF-8
+meta name=viewport content=width=device-width, initial-scale=1, viewport-fit=cover
+meta name=theme-color content=#101211
+meta name=description content=LIFEBOARD – prywatny tracker celów i codzienności
+link rel=manifest href=manifest.json
+titleLIFEBOARDtitle
+style
+root {
+  --bg#101211; --panel#191d1b; --panel2#202522;
+  --text#f1f4f1; --muted#89938d; --green#43c995;
+  --border#2b332e; --red#ef7777; --yellow#e9bd64;
+}
+{box-sizingborder-box}
+body{
+ margin0;backgroundvar(--bg);colorvar(--text);
+ font-familyInter,system-ui,-apple-system,sans-serif;
+ padding-bottom90px;
+}
+button,input,textarea,select{fontinherit}
+button{cursorpointer}
+header{
+ padding25px 20px 17px;displayflex;
+ justify-contentspace-between;align-itemscenter;
+ positionsticky;top0;background#101211ed;
+ backdrop-filterblur(15px);z-index5;
+}
+.logo{font-size23px;font-weight850;letter-spacing2px}
+.logo span{colorvar(--green)}
+.small{font-size12px;colorvar(--muted)}
+main{padding8px 17px 25px;max-width700px;marginauto}
+h1{font-size25px;margin10px 0 5px}
+h2{font-size17px;margin23px 0 12px}
+p{line-height1.5}
+.muted{colorvar(--muted)}
+.card{
+ backgroundvar(--panel);border1px solid var(--border);
+ border-radius17px;padding16px;margin-bottom12px;
+}
+.hero{
+ backgroundlinear-gradient(135deg,#183c30,#19241f);
+ border1px solid #28533f;border-radius19px;padding20px;
+ margin13px 0 17px;
+}
+.hero strong{font-size35px;displayblock;margin8px 0}
+.grid{displaygrid;grid-template-columns1fr 1fr;gap10px}
+.stat{backgroundvar(--panel);padding15px;border-radius15px;border1px solid var(--border)}
+.stat b{font-size25px;displayblock;margin6px 0}
+.icon{font-size20px}
+.progress{height7px;background#303a34;border-radius10px;overflowhidden;margin-top10px}
+.progress div{height100%;backgroundvar(--green);border-radius10px}
+.nav{
+ positionfixed;bottom0;left0;right0;z-index10;
+ displayflex;justify-contentspace-around;
+ background#171b19f5;border-top1px solid var(--border);
+ padding10px 3px calc(10px + env(safe-area-inset-bottom));
+ backdrop-filterblur(15px);
+}
+.nav button{
+ backgroundnone;border0;colorvar(--muted);
+ displayflex;flex-directioncolumn;align-itemscenter;
+ gap4px;font-size10px;min-width0;flex1;
+}
+.nav button.active{colorvar(--green)}
+.nav span{font-size20px}
+.btn{
+ border0;backgroundvar(--green);color#09251a;
+ border-radius11px;padding11px 15px;font-weight750;
+}
+.btn.secondary{backgroundvar(--panel2);colorvar(--text);border1px solid var(--border)}
+.btn.danger{background#482525;color#ffaaaa}
+.btn.smallbtn{padding7px 10px;font-size12px}
+.row{displayflex;justify-contentspace-between;align-itemscenter;gap10px}
+.task{displayflex;align-itemscenter;gap11px;padding12px 0;border-bottom1px solid var(--border)}
+.tasklast-child{border0}
+.check{
+ width23px;height23px;border1px solid #56635a;
+ border-radius7px;backgroundtransparent;color#101211;
+ flex-shrink0;
+}
+.check.done{backgroundvar(--green);border-colorvar(--green)}
+.task.done .taskname{text-decorationline-through;colorvar(--muted)}
+.tag{
+ font-size10px;colorvar(--green);background#20382d;
+ padding5px 8px;border-radius7px;white-spacenowrap;
+}
+input,textarea,select{
+ background#111613;border1px solid var(--border);
+ border-radius10px;colorvar(--text);padding12px;width100%;
+ margin6px 0 12px;outlinenone;
+}
+textarea{min-height110px;resizevertical}
+label{font-size12px;colorvar(--muted)}
+.form{margin-top16px}
+.actions{displayflex;gap8px;flex-wrapwrap}
+.goalhead{displayflex;justify-contentspace-between;gap8px}
+.empty{text-aligncenter;colorvar(--muted);padding28px 12px}
+.journal{white-spacepre-wrap;overflow-wrapanywhere}
+hr{border0;border-top1px solid var(--border);margin15px 0}
+#toast{
+ positionfixed;bottom100px;left50%;transformtranslateX(-50%);
+ background#29352e;padding11px 17px;border-radius10px;
+ displaynone;z-index30;font-size13px;
+}
+@media(min-width650px){main{padding-top20px}.nav{max-width700px;left50%;transformtranslateX(-50%);border-radius18px 18px 0 0}}
+style
+head
+body
+header
+ div
+  div class=logoLIFEspanBOARD.spandiv
+  div class=smallYOUR LIFE. YOUR RULES.div
+ div
+ div class=small id=todayDatediv
+header
+
+main id=appmain
+nav class=nav id=nav
+ button data-page=home class=activespan⌂spanHomebutton
+ button data-page=goalsspan◎spanGoalsbutton
+ button data-page=dailyspan☑spanDailybutton
+ button data-page=weeklyspan▦spanWeeklybutton
+ button data-page=morespan•••spanMorebutton
+nav
+div id=toastdiv
+
+script
+const KEY=LIFEBOARD_DATA_V1;
+const today=()=new Date().toISOString().slice(0,10);
+const uid=()=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=String(s).replace([&']g,c=({&&amp;,&lt;,&gt;,''&quot;,'&#39;}[c]));
+const dateLabel=d=dnew Date(d+T120000).toLocaleDateString(pl-PL)Bez terminu;
+const weekStart=()={
+ const d=new Date();d.setHours(0,0,0,0);
+ d.setDate(d.getDate()-(d.getDay()+6)%7);
+ return d.toISOString().slice(0,10);
+};
+const initial={
+ goals[],tasks[],habits[],journal[],habitLogs{}
+};
+let data;
+try{data=JSON.parse(localStorage.getItem(KEY))initial}
+catch(e){data=initial}
+let page=home;
+
+function save(){
+ localStorage.setItem(KEY,JSON.stringify(data));
+}
+function toast(msg){
+ const t=document.getElementById(toast);
+ t.textContent=msg;t.style.display=block;
+ setTimeout(()=t.style.display=none,2100);
+}
+function completed(tasks){return tasks.filter(t=t.done).length}
+function progress(tasks){return tasks.lengthMath.round(completed(tasks)tasks.length100)0}
+function weekTasks(){
+ const start=weekStart();
+ const end=new Date(start+T120000);
+ end.setDate(end.getDate()+6);
+ const endStr=end.toISOString().slice(0,10);
+ return data.tasks.filter(t=t.date=start&&t.date=endStr);
+}
+function taskHTML(t){
+ return `div class=task ${t.donedone}
+ button class=check ${t.donedone} onclick=toggleTask('${t.id}')${t.done✓}button
+ div style=flex1;min-width0
+  div class=taskname${esc(t.title)}div
+  div class=small${t.datedateLabel(t.date)Bez terminu} · ${esc(t.type)}div
+ div
+ button class=btn secondary smallbtn onclick=deleteTask('${t.id}')×button
+ div`;
+}
+function sectionTitle(title,sub=){
+ return `div class=rowdivh1${title}h1${sub`div class=small${sub}div`}divdiv`;
+}
+function render(){
+ document.getElementById(todayDate).textContent=new Date().toLocaleDateString(pl-PL,{daynumeric,monthshort});
+ document.querySelectorAll(.nav button).forEach(b={
+  b.classList.toggle(active,b.dataset.page===page
+   (page===habitspage===journalpage===progresspage===settings)&&b.dataset.page===more);
+ });
+ const app=document.getElementById(app);
+ const pages={homehomePage,goalsgoalsPage,dailydailyPage,weeklyweeklyPage,moremorePage,habitshabitsPage,journaljournalPage,progressprogressPage,settingssettingsPage};
+ app.innerHTML=(pages[page]homePage)();
+}
+function homePage(){
+ const tasks=data.tasks.filter(t=t.date===today());
+ const week=weekTasks();
+ const p=progress(tasks);
+ return `${sectionTitle(Dashboard,Twoje centrum dowodzenia)}
+ div class=hero
+  div class=smallTWÓJ DZISIEJSZY POSTĘPdiv
+  strong${p}%strong
+  div class=progressdiv style=width${p}%divdiv
+  div class=small style=margin-top9px${completed(tasks)} z ${tasks.length} zadań wykonanychdiv
+ div
+ div class=grid
+  div class=statdiv class=smallAKTYWNE CELEdivb${data.goals.filter(g=!g.done).length}bspan class=smallDługoterminowespandiv
+  div class=statdiv class=smallTEN TYDZIEŃdivb${completed(week)}${week.length}bspan class=smallZadań wykonanychspandiv
+ div
+ h2Dzisiejsze zadaniah2
+ div class=card${tasks.lengthtasks.map(taskHTML).join()'div class=emptyBrak zadań na dziś. Dobry moment, żeby coś zaplanować.div'}
+ button class=btn secondary onclick=go('daily')+ Dodaj zadaniebuttondiv
+ h2Twoje celeh2
+ ${data.goals.filter(g=!g.done).slice(0,3).map(goalCard).join()'div class=card emptyNie masz jeszcze aktywnych celów.div'}
+ button class=btn secondary onclick=go('goals')Zobacz wszystkie cele →button`;
+}
+function goalCard(g){
+ return `div class=card
+ div class=goalheadb${esc(g.title)}bspan class=tag${g.progress}%spandiv
+ div class=small${esc(g.categoryOsobisty)} · ${dateLabel(g.deadline)}div
+ div class=progressdiv style=width${g.progress}%divdiv
+ div class=row style=margin-top12px
+ button class=btn secondary smallbtn onclick=editGoal('${g.id}')Edytuj postępbutton
+ button class=btn secondary smallbtn onclick=finishGoal('${g.id}')✓ Zakończbutton
+ divdiv`;
+}
+function goalsPage(){
+ return `${sectionTitle(Moje cele,Wizja długoterminowa i konkretne kamienie milowe)}
+ div class=card
+ h2 style=margin-top0Dodaj nowy celh2
+ labelNazwa celulabelinput id=goalTitle placeholder=Np. Rozwinąć własne studio fotograficzne
+ labelKategorialabelselect id=goalCategoryoptionOsobistyoptionoptionKarieraoptionoptionFotografiaoptionoptionFinanseoptionoptionZdrowieoptionoptionRozwójoptionoptionInneoptionselect
+ labelTermin (opcjonalnie)labelinput type=date id=goalDate
+ labelOpis  dlaczego jest ważnylabeltextarea id=goalDesc placeholder=Opisz, co chcesz osiągnąć...textarea
+ button class=btn onclick=addGoal()+ Utwórz celbutton
+ div
+ h2Aktywne cele (${data.goals.filter(g=!g.done).length})h2
+ ${data.goals.filter(g=!g.done).map(goalCard).join()'div class=card emptyDodaj pierwszy cel. Zacznij od czegoś ważnego.div'}
+ h2Ukończone (${data.goals.filter(g=g.done).length})h2
+ ${data.goals.filter(g=g.done).map(g=`div class=carddiv class=rowb✓ ${esc(g.title)}bspan class=tagDONEspandivdiv`).join()}`;
+}
+function dailyPage(){
+ const tasks=data.tasks.filter(t=t.date===today());
+ return `${sectionTitle(Daily,Małe kroki. Codzienna konsekwencja.)}
+ div class=card
+ labelNowe zadanielabelinput id=taskTitle placeholder=Co chcesz dziś zrobić
+ labelPriorytetlabelselect id=taskPriorityoptionNormalnyoptionoptionWysokioptionoptionNiskioptionselect
+ button class=btn onclick=addTask('Daily',today())+ Dodaj zadaniebutton
+ div
+ div class=carddiv class=rowbDzisiejsza listabspan class=tag${completed(tasks)}${tasks.length}spandiv
+ ${tasks.map(taskHTML).join()'div class=emptyDzień zaczyna się od pustej listy.div'}div
+ h2Nawyki na dziśh2
+ ${habitList()}`;
+}
+function weeklyPage(){
+ const tasks=weekTasks();
+ return `${sectionTitle(Weekly,Plan i podsumowanie bieżącego tygodnia)}
+ div class=herodiv class=smallREALIZACJA TYGODNIAdivstrong${progress(tasks)}%strongdiv class=progressdiv style=width${progress(tasks)}%divdivdiv class=small style=margin-top8px${completed(tasks)} z ${tasks.length} wykonanychdivdiv
+ div class=card
+ labelNowe zadanie na tydzieńlabelinput id=taskTitle placeholder=Co ma się wydarzyć w tym tygodniu
+ labelTerminlabelinput type=date id=taskDate value=${today()}
+ button class=btn onclick=addTask('Weekly',document.getElementById('taskDate').value)+ Dodaj do planubutton
+ div
+ div class=cardbPlan tygodniab${tasks.map(taskHTML).join()'div class=emptyBrak zaplanowanych zadań w tym tygodniu.div'}div`;
+}
+function habitList(){
+ return data.habits.map(h={
+  const key=today()+_+h.id;
+  const done=!!data.habitLogs[key];
+  return `div class=taskbutton class=check ${donedone} onclick=toggleHabit('${h.id}')${done✓}buttondiv style=flex1b${esc(h.title)}bdiv class=small${h.streak0} dni regularnościdivdivbutton class=btn secondary smallbtn onclick=deleteHabit('${h.id}')×buttondiv`;
+ }).join()'div class=emptyDodaj nawyk w sekcji Nawyki.div';
+}
+function habitsPage(){
+ return `${sectionTitle(Nawyki,Buduj regularność, nie perfekcję.)}
+ div class=cardlabelNazwa nowego nawykulabelinput id=habitTitle placeholder=Np. Czytanie 20 minut
+ button class=btn onclick=addHabit()+ Dodaj nawykbuttondiv
+ div class=cardbDzisiejsze nawykib${habitList()}div`;
+}
+function journalPage(){
+ return `${sectionTitle(Journal,Twoje prywatne miejsce na myśli)}
+ div class=card
+ labelNowy wpislabelinput id=journalTitle placeholder=Tytuł wpisu (opcjonalnie)
+ textarea id=journalText placeholder=O czym dziś myślisz Co się wydarzyłotextarea
+ button class=btn onclick=addJournal()Zapisz wpisbutton
+ div
+ h2Historia wpisówh2
+ ${data.journal.map(j=`div class=carddiv class=rowb${esc(j.titleBez tytułu)}bspan class=small${dateLabel(j.date)}spandivhrdiv class=journal${esc(j.text)}divdiv style=text-alignright;margin-top10pxbutton class=btn danger smallbtn onclick=deleteJournal('${j.id}')Usuń wpisbuttondivdiv`).join()'div class=card emptyJeszcze nie ma żadnych wpisów.div'}`;
+}
+function progressPage(){
+ const tasks=data.tasks;
+ const done=completed(tasks);
+ const total=data.goals.length;
+ const achieved=data.goals.filter(g=g.done).length;
+ const logs=Object.values(data.habitLogs).filter(Boolean).length;
+ return `${sectionTitle(Progress,Zobacz, jak daleko już zaszedłeś)}
+ div class=grid
+ div class=statdiv class=smallZADANIAdivb${done}bspan class=smallWykonane łączniespandiv
+ div class=statdiv class=smallCELEdivb${achieved}${total}bspan class=smallUkończonespandiv
+ div class=statdiv class=smallNAWYKIdivb${logs}bspan class=smallZaznaczone dnispandiv
+ div class=statdiv class=smallZADANIA ŁĄCZNIEdivb${tasks.length}bspan class=smallW planiespandiv
+ div
+ h2Postęp celówh2
+ ${data.goals.map(g=goalCard(g)).join()'div class=card emptyBrak danych do wyświetlenia.div'}
+ h2Regularność nawykówh2div class=card${data.habits.map(h=`div class=row style=padding8px 0span${esc(h.title)}spanb${Object.keys(data.habitLogs).filter(k=k.endsWith(_+h.id)&&data.habitLogs[k]).length} dnibdiv`).join()Dodaj nawyki, aby śledzić regularność.}div`;
+}
+function morePage(){
+ return `${sectionTitle(More,Pozostałe moduły)}
+ div class=card
+ ${[habits,journal,progress,settings].map((p,i)={
+ const labels=[Nawyki,Dziennik,Statystyki,Ustawienia];
+ const icons=[↻,✎,▥,⚙];
+ return `div class=task onclick=go('${p}') style=cursorpointerspan class=icon${icons[i]}spanb style=flex1${labels[i]}bspan→spandiv`;
+ }).join()}
+ div`;
+}
+function settingsPage(){
+ return `${sectionTitle(Ustawienia,Twoje dane, Twoja kontrola)}
+ div class=cardh2 style=margin-top0Kopia zapasowah2
+ p class=smallEksportuj dane do pliku JSON. Możesz później odtworzyć je na tym samym lub innym urządzeniu.p
+ button class=btn onclick=exportData()↓ Eksportuj danebutton
+ hrlabelPrzywróć kopię zapasowąlabelinput type=file id=importFile accept=.json,applicationjson
+ button class=btn secondary onclick=importData()Importuj danebutton
+ div
+ div class=cardh2 style=margin-top0Prywatnośćh2
+ p class=smallWszystkie dane LIFEBOARD są zapisywane lokalnie w pamięci przeglądarki tego urządzenia. Nie wysyłamy ich na żaden serwer.p
+ p class=smallWyczyszczenie danych przeglądarki może usunąć Twoje wpisy. Regularnie eksportuj kopię zapasową.p
+ button class=btn danger onclick=clearData()Usuń wszystkie danebutton
+ div
+ div class=small style=text-aligncenter;margin25pxLIFEBOARD v1.0 · Made for yourself.div`;
+}
+function go(p){page=p;render();window.scrollTo(0,0)}
+document.getElementById(nav).addEventListener(click,e={
+ const b=e.target.closest(button[data-page]);
+ if(b)go(b.dataset.page);
+});
+function addGoal(){
+ const title=document.getElementById(goalTitle).value.trim();
+ if(!title)return toast(Wpisz nazwę celu.);
+ data.goals.unshift({iduid(),title,categorydocument.getElementById(goalCategory).value,deadlinedocument.getElementById(goalDate).value,descdocument.getElementById(goalDesc).value,progress0,donefalse});
+ save();render();toast(Cel został dodany.);
+}
+function editGoal(id){
+ const g=data.goals.find(x=x.id===id);if(!g)return;
+ const n=prompt(Postęp celu w procentach (0–100),g.progress);
+ if(n===null)return;
+ const v=Number(n);
+ if(!Number.isFinite(v)v0v100)return toast(Podaj liczbę od 0 do 100.);
+ g.progress=Math.round(v);if(v===100)g.done=true;
+ save();render();
+}
+function finishGoal(id){
+ const g=data.goals.find(x=x.id===id);if(g){g.done=true;g.progress=100;save();render();toast(Cel ukończony!);}
+}
+function addTask(type,date){
+ const title=document.getElementById(taskTitle).value.trim();
+ if(!title)return toast(Wpisz treść zadania.);
+ data.tasks.unshift({iduid(),title,type,date,prioritydocument.getElementById(taskPriority).valueNormalny,donefalse});
+ save();render();toast(Zadanie dodane.);
+}
+function toggleTask(id){
+ const t=data.tasks.find(x=x.id===id);if(t){t.done=!t.done;save();render();}
+}
+function deleteTask(id){
+ if(confirm(Usunąć to zadanie)){data.tasks=data.tasks.filter(t=t.id!==id);save();render();}
+}
+function addHabit(){
+ const title=document.getElementById(habitTitle).value.trim();
+ if(!title)return toast(Wpisz nazwę nawyku.);
+ data.habits.push({iduid(),title});save();render();toast(Nawyk dodany.);
+}
+function toggleHabit(id){
+ const key=today()+_+id;
+ if(data.habitLogs[key])delete data.habitLogs[key];
+ else data.habitLogs[key]=true;
+ save();render();
+}
+function deleteHabit(id){
+ if(confirm(Usunąć ten nawyk)){
+ data.habits=data.habits.filter(h=h.id!==id);
+ Object.keys(data.habitLogs).forEach(k={if(k.endsWith(_+id))delete data.habitLogs[k]});
+ save();render();
+ }
+}
+function addJournal(){
+ const text=document.getElementById(journalText).value.trim();
+ if(!text)return toast(Wpis jest pusty.);
+ data.journal.unshift({iduid(),titledocument.getElementById(journalTitle).value.trim(),text,datetoday()});
+ save();render();toast(Wpis zapisany.);
+}
+function deleteJournal(id){
+ if(confirm(Usunąć wpis)){data.journal=data.journal.filter(j=j.id!==id);save();render();}
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(data,null,2)],{typeapplicationjson});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement(a);a.href=url;a.download=LIFEBOARD-backup-+today()+.json;a.click();
+ URL.revokeObjectURL(url);toast(Kopia zapasowa gotowa.);
+}
+function importData(){
+ const file=document.getElementById(importFile).files[0];
+ if(!file)return toast(Wybierz plik kopii zapasowej.);
+ const reader=new FileReader();
+ reader.onload=()={
+ try{
+ const x=JSON.parse(reader.result);
+ if(!x.goals!x.tasks!x.habits!x.journal!x.habitLogs)throw Error();
+ if(!confirm(Import zastąpi aktualne dane. Kontynuować))return;
+ data=x;save();render();toast(Dane przywrócone.);
+ }catch(e){toast(Nieprawidłowy plik kopii zapasowej.);}
+ };
+ reader.readAsText(file);
+}
+function clearData(){
+ if(!confirm(Na pewno usunąć WSZYSTKIE dane LIFEBOARD))return;
+ if(!confirm(Ostatnie potwierdzenie. Tej operacji nie można cofnąć.))return;
+ data={...initial,goals[],tasks[],habits[],journal[],habitLogs{}};
+ save();render();toast(Dane usunięte.);
+}
+if(serviceWorker in navigator && location.protocol.startsWith(http)){
+ navigator.serviceWorker.register(.sw.js).catch(()={});
+}
+render();
+script
+body
+html
