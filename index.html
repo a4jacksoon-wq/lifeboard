@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -6,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101211">
 <meta name="description" content="LIFEBOARD – prywatny tracker celów i codzienności">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="./manifest.json">
 <title>LIFEBOARD</title>
 <style>
 :root {
@@ -19,407 +18,574 @@
   --border: #2b332e;
   --red: #ef7777;
   --yellow: #e9bd64;
+  --blue: #82b9ef;
+  --purple: #b69aee;
 }
-{box-sizingborder-box}
-body{
- margin0;backgroundvar(--bg);colorvar(--text);
- font-familyInter,system-ui,-apple-system,sans-serif;
- padding-bottom90px;
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
 }
-button,input,textarea,select{fontinherit}
-button{cursorpointer}
-header{
- padding25px 20px 17px;displayflex;
- justify-contentspace-between;align-itemscenter;
- positionsticky;top0;background#101211ed;
- backdrop-filterblur(15px);z-index5;
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+.app { max-width: 1050px; margin: auto; padding: 22px 18px 100px; }
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; margin-bottom: 25px;
 }
-.logo{font-size23px;font-weight850;letter-spacing2px}
-.logo span{colorvar(--green)}
-.small{font-size12px;colorvar(--muted)}
-main{padding8px 17px 25px;max-width700px;marginauto}
-h1{font-size25px;margin10px 0 5px}
-h2{font-size17px;margin23px 0 12px}
-p{line-height1.5}
-.muted{colorvar(--muted)}
-.card{
- backgroundvar(--panel);border1px solid var(--border);
- border-radius17px;padding16px;margin-bottom12px;
+.logo { font-size: 22px; font-weight: 850; letter-spacing: 2px; }
+.logo span { color: var(--green); }
+.date-label { color: var(--muted); font-size: 12px; text-align: right; }
+h1 { font-size: 26px; margin: 8px 0 4px; }
+h2 { font-size: 18px; margin: 0 0 14px; }
+h3 { font-size: 15px; margin: 0 0 8px; }
+p { margin: 5px 0; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.section { margin-top: 25px; }
+.grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.grid.three { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 15px; padding: 16px; min-width: 0;
 }
-.hero{
- backgroundlinear-gradient(135deg,#183c30,#19241f);
- border1px solid #28533f;border-radius19px;padding20px;
- margin13px 0 17px;
+.kpi { min-height: 105px; }
+.kpi .number { font-size: 29px; font-weight: 800; margin-top: 7px; }
+.green { color: var(--green); }
+.red { color: var(--red); }
+.yellow { color: var(--yellow); }
+.blue { color: var(--blue); }
+.purple { color: var(--purple); }
+.progress {
+  height: 7px; border-radius: 20px; background: #303833;
+  overflow: hidden; margin-top: 10px;
 }
-.hero strong{font-size35px;displayblock;margin8px 0}
-.grid{displaygrid;grid-template-columns1fr 1fr;gap10px}
-.stat{backgroundvar(--panel);padding15px;border-radius15px;border1px solid var(--border)}
-.stat b{font-size25px;displayblock;margin6px 0}
-.icon{font-size20px}
-.progress{height7px;background#303a34;border-radius10px;overflowhidden;margin-top10px}
-.progress div{height100%;backgroundvar(--green);border-radius10px}
-.nav{
- positionfixed;bottom0;left0;right0;z-index10;
- displayflex;justify-contentspace-around;
- background#171b19f5;border-top1px solid var(--border);
- padding10px 3px calc(10px + env(safe-area-inset-bottom));
- backdrop-filterblur(15px);
+.progress > div { height: 100%; background: var(--green); border-radius: 20px; }
+.tabs {
+  display: flex; gap: 7px; overflow-x: auto; padding: 4px 0 13px;
+  scrollbar-width: none; border-bottom: 1px solid var(--border);
 }
-.nav button{
- backgroundnone;border0;colorvar(--muted);
- displayflex;flex-directioncolumn;align-itemscenter;
- gap4px;font-size10px;min-width0;flex1;
+.tabs button {
+  flex: 0 0 auto; background: transparent; border: 1px solid transparent;
+  color: var(--muted); border-radius: 10px; padding: 9px 13px;
 }
-.nav button.active{colorvar(--green)}
-.nav span{font-size20px}
-.btn{
- border0;backgroundvar(--green);color#09251a;
- border-radius11px;padding11px 15px;font-weight750;
+.tabs button.active { background: #20352c; color: var(--green); border-color: #315b48; }
+.view { display: none; }
+.view.active { display: block; }
+.btn {
+  border: 0; background: var(--green); color: #07130d;
+  padding: 10px 14px; border-radius: 9px; font-weight: 750;
 }
-.btn.secondary{backgroundvar(--panel2);colorvar(--text);border1px solid var(--border)}
-.btn.danger{background#482525;color#ffaaaa}
-.btn.smallbtn{padding7px 10px;font-size12px}
-.row{displayflex;justify-contentspace-between;align-itemscenter;gap10px}
-.task{displayflex;align-itemscenter;gap11px;padding12px 0;border-bottom1px solid var(--border)}
-.tasklast-child{border0}
-.check{
- width23px;height23px;border1px solid #56635a;
- border-radius7px;backgroundtransparent;color#101211;
- flex-shrink0;
+.btn.secondary { background: var(--panel2); color: var(--text); border: 1px solid var(--border); }
+.btn.danger { background: #482626; color: #ffb0b0; }
+.btn.smallbtn { padding: 6px 10px; font-size: 12px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+input, textarea, select {
+  width: 100%; background: #111613; color: var(--text);
+  border: 1px solid var(--border); border-radius: 9px;
+  padding: 11px; outline: none; margin-top: 5px;
 }
-.check.done{backgroundvar(--green);border-colorvar(--green)}
-.task.done .taskname{text-decorationline-through;colorvar(--muted)}
-.tag{
- font-size10px;colorvar(--green);background#20382d;
- padding5px 8px;border-radius7px;white-spacenowrap;
+input:focus, textarea:focus, select:focus { border-color: var(--green); }
+textarea { min-height: 90px; resize: vertical; }
+label { display: block; color: var(--muted); font-size: 12px; margin: 10px 0; }
+.form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.item {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border);
 }
-input,textarea,select{
- background#111613;border1px solid var(--border);
- border-radius10px;colorvar(--text);padding12px;width100%;
- margin6px 0 12px;outlinenone;
+.item:last-child { border-bottom: 0; }
+.item-main { flex: 1; min-width: 0; }
+.item-title { font-weight: 650; overflow-wrap: anywhere; }
+.item.done .item-title { text-decoration: line-through; color: var(--muted); }
+.item-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.item-actions { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+.icon-btn {
+  background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 9px;
 }
-textarea{min-height110px;resizevertical}
-label{font-size12px;colorvar(--muted)}
-.form{margin-top16px}
-.actions{displayflex;gap8px;flex-wrapwrap}
-.goalhead{displayflex;justify-contentspace-between;gap8px}
-.empty{text-aligncenter;colorvar(--muted);padding28px 12px}
-.journal{white-spacepre-wrap;overflow-wrapanywhere}
-hr{border0;border-top1px solid var(--border);margin15px 0}
-#toast{
- positionfixed;bottom100px;left50%;transformtranslateX(-50%);
- background#29352e;padding11px 17px;border-radius10px;
- displaynone;z-index30;font-size13px;
+.empty { text-align: center; color: var(--muted); padding: 25px 8px; }
+.checkline { display: flex; align-items: center; gap: 10px; }
+.checkline input { width: auto; accent-color: var(--green); }
+.badge {
+  display: inline-block; padding: 3px 8px; border-radius: 20px;
+  background: var(--panel2); color: var(--muted); font-size: 11px;
 }
-@media(min-width650px){main{padding-top20px}.nav{max-width700px;left50%;transformtranslateX(-50%);border-radius18px 18px 0 0}}
-style
-head
-body
-header
- div
-  div class=logoLIFEspanBOARD.spandiv
-  div class=smallYOUR LIFE. YOUR RULES.div
- div
- div class=small id=todayDatediv
-header
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.hidden { display: none !important; }
+footer { color: var(--muted); text-align: center; font-size: 11px; margin-top: 35px; }
+@media (max-width: 520px) {
+  .app { padding: 17px 13px 90px; }
+  .grid.three { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .form-grid { grid-template-columns: 1fr; }
+  h1 { font-size: 23px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">LIFE<span>BOARD</span></div>
+    <div class="date-label" id="todayLabel"></div>
+  </header>
 
-main id=appmain
-nav class=nav id=nav
- button data-page=home class=activespan⌂spanHomebutton
- button data-page=goalsspan◎spanGoalsbutton
- button data-page=dailyspan☑spanDailybutton
- button data-page=weeklyspan▦spanWeeklybutton
- button data-page=morespan•••spanMorebutton
-nav
-div id=toastdiv
+  <nav class="tabs" aria-label="Nawigacja">
+    <button class="active" data-view="home">⌂ Start</button>
+    <button data-view="goals">◎ Cele</button>
+    <button data-view="daily">☀ Dzisiaj</button>
+    <button data-view="weekly">▦ Tydzień</button>
+    <button data-view="habits">↗ Nawyki</button>
+    <button data-view="journal">✎ Dziennik</button>
+    <button data-view="progress">◷ Postępy</button>
+    <button data-view="settings">⚙ Więcej</button>
+  </nav>
 
-script
-const KEY=LIFEBOARD_DATA_V1;
-const today=()=new Date().toISOString().slice(0,10);
-const uid=()=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-const esc=s=String(s).replace([&']g,c=({&&amp;,&lt;,&gt;,''&quot;,'&#39;}[c]));
-const dateLabel=d=dnew Date(d+T120000).toLocaleDateString(pl-PL)Bez terminu;
-const weekStart=()={
- const d=new Date();d.setHours(0,0,0,0);
- d.setDate(d.getDate()-(d.getDay()+6)%7);
- return d.toISOString().slice(0,10);
-};
-const initial={
- goals[],tasks[],habits[],journal[],habitLogs{}
-};
-let data;
-try{data=JSON.parse(localStorage.getItem(KEY))initial}
-catch(e){data=initial}
-let page=home;
+  <main>
+    <section class="view active" id="home">
+      <div class="section">
+        <p class="muted small" id="greeting">TWÓJ OSOBISTY PLAN</p>
+        <h1>Witaj w LIFEBOARD.</h1>
+        <p class="muted">Małe kroki. Konsekwentne działanie. Duże zmiany.</p>
+      </div>
+      <div class="grid three section" id="homeStats"></div>
+      <div class="section card">
+        <div class="topline"><h2>Dzisiejsze zadania</h2><span class="badge" id="dailyCount">0</span></div>
+        <div id="homeTasks"></div>
+        <div class="actions"><button class="btn secondary" onclick="showView('daily')">Przejdź do dnia →</button></div>
+      </div>
+      <div class="section card">
+        <h2>Twoje cele</h2>
+        <div id="homeGoals"></div>
+        <div class="actions"><button class="btn secondary" onclick="showView('goals')">Zobacz wszystkie →</button></div>
+      </div>
+      <div class="section card">
+        <h2>Dzisiejsze nawyki</h2>
+        <div id="homeHabits"></div>
+      </div>
+    </section>
 
-function save(){
- localStorage.setItem(KEY,JSON.stringify(data));
+    <section class="view" id="goals">
+      <div class="section">
+        <div class="topline"><div><h1>Cele</h1><p class="muted">Kierunek, plan i postęp.</p></div>
+          <button class="btn" onclick="openForm('goalForm')">+ Dodaj cel</button>
+        </div>
+      </div>
+      <div id="goalForm" class="card section hidden">
+        <h2>Nowy cel</h2>
+        <label>Nazwa celu<input id="goalTitle" placeholder="Np. Uruchomić własne studio"></label>
+        <div class="form-grid">
+          <label>Kategoria<select id="goalCategory"><option>Osobiste</option><option>Praca</option><option>Finanse</option><option>Zdrowie</option><option>Rozwój</option><option>Inne</option></select></label>
+          <label>Termin<input type="date" id="goalDate"></label>
+        </div>
+        <label>Opis<textarea id="goalDescription" placeholder="Co chcesz osiągnąć i dlaczego?"></textarea></label>
+        <div class="actions"><button class="btn" onclick="addGoal()">Zapisz cel</button><button class="btn secondary" onclick="closeForm('goalForm')">Anuluj</button></div>
+      </div>
+      <div id="goalsList" class="section"></div>
+    </section>
+
+    <section class="view" id="daily">
+      <div class="section">
+        <div class="topline"><div><h1>Dzisiaj</h1><p class="muted" id="dailyDate"></p></div>
+          <button class="btn" onclick="addTaskPrompt('daily')">+ Zadanie</button>
+        </div>
+      </div>
+      <div class="card section"><div class="topline"><h2>Lista zadań</h2><span class="badge" id="dailyProgress"></span></div><div id="dailyList"></div></div>
+    </section>
+
+    <section class="view" id="weekly">
+      <div class="section">
+        <div class="topline"><div><h1>Ten tydzień</h1><p class="muted" id="weekDate"></p></div>
+          <button class="btn" onclick="addTaskPrompt('weekly')">+ Zadanie</button>
+        </div>
+      </div>
+      <div class="card section"><h2>Plan tygodnia</h2><div id="weeklyList"></div></div>
+    </section>
+
+    <section class="view" id="habits">
+      <div class="section">
+        <div class="topline"><div><h1>Nawyki</h1><p class="muted">Regularność buduje rezultaty.</p></div>
+          <button class="btn" onclick="addHabitPrompt()">+ Nawyk</button>
+        </div>
+      </div>
+      <div id="habitsList" class="section"></div>
+    </section>
+
+    <section class="view" id="journal">
+      <div class="section"><h1>Dziennik</h1><p class="muted">Zatrzymaj myśli. Zapisz wnioski.</p></div>
+      <div class="card section">
+        <h2>Nowy wpis</h2>
+        <label>Jak się dziś czujesz?
+          <select id="journalMood"><option value="🙂">🙂 Dobrze</option><option value="😐">😐 Neutralnie</option><option value="😔">😔 Gorzej</option><option value="🔥">🔥 Pełna energia</option><option value="😌">😌 Spokojnie</option></select>
+        </label>
+        <label>Treść wpisu<textarea id="journalText" placeholder="Co dziś się wydarzyło? Co poszło dobrze? Czego się nauczyłeś?" rows="5"></textarea></label>
+        <button class="btn" onclick="addJournal()">Zapisz wpis</button>
+      </div>
+      <div class="section" id="journalList"></div>
+    </section>
+
+    <section class="view" id="progress">
+      <div class="section"><h1>Postępy</h1><p class="muted">Sprawdź, jak wygląda Twoja konsekwencja.</p></div>
+      <div class="grid three section" id="progressStats"></div>
+      <div class="card section"><h2>Realizacja zadań</h2><div id="taskProgress"></div></div>
+      <div class="card section"><h2>Realizacja nawyków</h2><div id="habitProgress"></div></div>
+      <div class="card section"><h2>Twoje cele</h2><div id="goalProgress"></div></div>
+    </section>
+
+    <section class="view" id="settings">
+      <div class="section"><h1>Więcej</h1><p class="muted">Ustawienia i bezpieczeństwo danych.</p></div>
+      <div class="card section">
+        <h2>Kopia zapasowa</h2>
+        <p class="muted small">Eksportuj dane regularnie. Plik JSON pozwoli Ci odtworzyć cele, zadania, nawyki i wpisy.</p>
+        <div class="actions"><button class="btn" onclick="exportData()">Eksportuj dane</button><button class="btn secondary" onclick="document.getElementById('importFile').click()">Importuj dane</button></div>
+        <input class="hidden" type="file" id="importFile" accept=".json,application/json" onchange="importData(event)">
+      </div>
+      <div class="card section">
+        <h2>Dane aplikacji</h2>
+        <p class="muted small">Dane są przechowywane w pamięci przeglądarki na tym urządzeniu. Nie są wysyłane na serwer.</p>
+        <div class="actions"><button class="btn danger" onclick="clearData()">Usuń wszystkie dane</button></div>
+      </div>
+      <div class="card section">
+        <h2>O aplikacji</h2>
+        <p class="muted small">LIFEBOARD • Prywatny planer celów i codzienności.</p>
+        <p class="muted small">Wersja 1.0 • Dane lokalne • Tryb offline</p>
+      </div>
+    </section>
+  </main>
+  <footer>LIFEBOARD · TWOJE TEMPO. TWOJE CELE. TWOJA DROGA.</footer>
+</div>
+
+<script>
+"use strict";
+
+const STORAGE_KEY = "lifeboard_v1";
+
+function localDate(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
-function toast(msg){
- const t=document.getElementById(toast);
- t.textContent=msg;t.style.display=block;
- setTimeout(()=t.style.display=none,2100);
+function weekStart(date = new Date()) {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - day);
+  return localDate(d);
 }
-function completed(tasks){return tasks.filter(t=t.done).length}
-function progress(tasks){return tasks.lengthMath.round(completed(tasks)tasks.length100)0}
-function weekTasks(){
- const start=weekStart();
- const end=new Date(start+T120000);
- end.setDate(end.getDate()+6);
- const endStr=end.toISOString().slice(0,10);
- return data.tasks.filter(t=t.date=start&&t.date=endStr);
+function makeId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
-function taskHTML(t){
- return `div class=task ${t.donedone}
- button class=check ${t.donedone} onclick=toggleTask('${t.id}')${t.done✓}button
- div style=flex1;min-width0
-  div class=taskname${esc(t.title)}div
-  div class=small${t.datedateLabel(t.date)Bez terminu} · ${esc(t.type)}div
- div
- button class=btn secondary smallbtn onclick=deleteTask('${t.id}')×button
- div`;
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
 }
-function sectionTitle(title,sub=){
- return `div class=rowdivh1${title}h1${sub`div class=small${sub}div`}divdiv`;
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { goals: [], tasks: [], habits: [], habitLogs: {}, journal: [] };
+    const data = JSON.parse(raw);
+    return {
+      goals: Array.isArray(data.goals) ? data.goals : [],
+      tasks: Array.isArray(data.tasks) ? data.tasks : [],
+      habits: Array.isArray(data.habits) ? data.habits : [],
+      habitLogs: data.habitLogs && typeof data.habitLogs === "object" ? data.habitLogs : {},
+      journal: Array.isArray(data.journal) ? data.journal : []
+    };
+  } catch (e) {
+    alert("Nie udało się odczytać zapisanych danych. Nie zapisuj nowych zmian, dopóki nie odzyskasz kopii zapasowej.");
+    return { goals: [], tasks: [], habits: [], habitLogs: {}, journal: [] };
+  }
 }
-function render(){
- document.getElementById(todayDate).textContent=new Date().toLocaleDateString(pl-PL,{daynumeric,monthshort});
- document.querySelectorAll(.nav button).forEach(b={
-  b.classList.toggle(active,b.dataset.page===page
-   (page===habitspage===journalpage===progresspage===settings)&&b.dataset.page===more);
- });
- const app=document.getElementById(app);
- const pages={homehomePage,goalsgoalsPage,dailydailyPage,weeklyweeklyPage,moremorePage,habitshabitsPage,journaljournalPage,progressprogressPage,settingssettingsPage};
- app.innerHTML=(pages[page]homePage)();
+let db = loadData();
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    renderAll();
+  } catch (e) {
+    alert("Nie udało się zapisać danych. Sprawdź wolne miejsce w przeglądarce i wykonaj eksport kopii zapasowej.");
+  }
 }
-function homePage(){
- const tasks=data.tasks.filter(t=t.date===today());
- const week=weekTasks();
- const p=progress(tasks);
- return `${sectionTitle(Dashboard,Twoje centrum dowodzenia)}
- div class=hero
-  div class=smallTWÓJ DZISIEJSZY POSTĘPdiv
-  strong${p}%strong
-  div class=progressdiv style=width${p}%divdiv
-  div class=small style=margin-top9px${completed(tasks)} z ${tasks.length} zadań wykonanychdiv
- div
- div class=grid
-  div class=statdiv class=smallAKTYWNE CELEdivb${data.goals.filter(g=!g.done).length}bspan class=smallDługoterminowespandiv
-  div class=statdiv class=smallTEN TYDZIEŃdivb${completed(week)}${week.length}bspan class=smallZadań wykonanychspandiv
- div
- h2Dzisiejsze zadaniah2
- div class=card${tasks.lengthtasks.map(taskHTML).join()'div class=emptyBrak zadań na dziś. Dobry moment, żeby coś zaplanować.div'}
- button class=btn secondary onclick=go('daily')+ Dodaj zadaniebuttondiv
- h2Twoje celeh2
- ${data.goals.filter(g=!g.done).slice(0,3).map(goalCard).join()'div class=card emptyNie masz jeszcze aktywnych celów.div'}
- button class=btn secondary onclick=go('goals')Zobacz wszystkie cele →button`;
+function showView(id) {
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === id));
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
-function goalCard(g){
- return `div class=card
- div class=goalheadb${esc(g.title)}bspan class=tag${g.progress}%spandiv
- div class=small${esc(g.categoryOsobisty)} · ${dateLabel(g.deadline)}div
- div class=progressdiv style=width${g.progress}%divdiv
- div class=row style=margin-top12px
- button class=btn secondary smallbtn onclick=editGoal('${g.id}')Edytuj postępbutton
- button class=btn secondary smallbtn onclick=finishGoal('${g.id}')✓ Zakończbutton
- divdiv`;
-}
-function goalsPage(){
- return `${sectionTitle(Moje cele,Wizja długoterminowa i konkretne kamienie milowe)}
- div class=card
- h2 style=margin-top0Dodaj nowy celh2
- labelNazwa celulabelinput id=goalTitle placeholder=Np. Rozwinąć własne studio fotograficzne
- labelKategorialabelselect id=goalCategoryoptionOsobistyoptionoptionKarieraoptionoptionFotografiaoptionoptionFinanseoptionoptionZdrowieoptionoptionRozwójoptionoptionInneoptionselect
- labelTermin (opcjonalnie)labelinput type=date id=goalDate
- labelOpis  dlaczego jest ważnylabeltextarea id=goalDesc placeholder=Opisz, co chcesz osiągnąć...textarea
- button class=btn onclick=addGoal()+ Utwórz celbutton
- div
- h2Aktywne cele (${data.goals.filter(g=!g.done).length})h2
- ${data.goals.filter(g=!g.done).map(goalCard).join()'div class=card emptyDodaj pierwszy cel. Zacznij od czegoś ważnego.div'}
- h2Ukończone (${data.goals.filter(g=g.done).length})h2
- ${data.goals.filter(g=g.done).map(g=`div class=carddiv class=rowb✓ ${esc(g.title)}bspan class=tagDONEspandivdiv`).join()}`;
-}
-function dailyPage(){
- const tasks=data.tasks.filter(t=t.date===today());
- return `${sectionTitle(Daily,Małe kroki. Codzienna konsekwencja.)}
- div class=card
- labelNowe zadanielabelinput id=taskTitle placeholder=Co chcesz dziś zrobić
- labelPriorytetlabelselect id=taskPriorityoptionNormalnyoptionoptionWysokioptionoptionNiskioptionselect
- button class=btn onclick=addTask('Daily',today())+ Dodaj zadaniebutton
- div
- div class=carddiv class=rowbDzisiejsza listabspan class=tag${completed(tasks)}${tasks.length}spandiv
- ${tasks.map(taskHTML).join()'div class=emptyDzień zaczyna się od pustej listy.div'}div
- h2Nawyki na dziśh2
- ${habitList()}`;
-}
-function weeklyPage(){
- const tasks=weekTasks();
- return `${sectionTitle(Weekly,Plan i podsumowanie bieżącego tygodnia)}
- div class=herodiv class=smallREALIZACJA TYGODNIAdivstrong${progress(tasks)}%strongdiv class=progressdiv style=width${progress(tasks)}%divdivdiv class=small style=margin-top8px${completed(tasks)} z ${tasks.length} wykonanychdivdiv
- div class=card
- labelNowe zadanie na tydzieńlabelinput id=taskTitle placeholder=Co ma się wydarzyć w tym tygodniu
- labelTerminlabelinput type=date id=taskDate value=${today()}
- button class=btn onclick=addTask('Weekly',document.getElementById('taskDate').value)+ Dodaj do planubutton
- div
- div class=cardbPlan tygodniab${tasks.map(taskHTML).join()'div class=emptyBrak zaplanowanych zadań w tym tygodniu.div'}div`;
-}
-function habitList(){
- return data.habits.map(h={
-  const key=today()+_+h.id;
-  const done=!!data.habitLogs[key];
-  return `div class=taskbutton class=check ${donedone} onclick=toggleHabit('${h.id}')${done✓}buttondiv style=flex1b${esc(h.title)}bdiv class=small${h.streak0} dni regularnościdivdivbutton class=btn secondary smallbtn onclick=deleteHabit('${h.id}')×buttondiv`;
- }).join()'div class=emptyDodaj nawyk w sekcji Nawyki.div';
-}
-function habitsPage(){
- return `${sectionTitle(Nawyki,Buduj regularność, nie perfekcję.)}
- div class=cardlabelNazwa nowego nawykulabelinput id=habitTitle placeholder=Np. Czytanie 20 minut
- button class=btn onclick=addHabit()+ Dodaj nawykbuttondiv
- div class=cardbDzisiejsze nawykib${habitList()}div`;
-}
-function journalPage(){
- return `${sectionTitle(Journal,Twoje prywatne miejsce na myśli)}
- div class=card
- labelNowy wpislabelinput id=journalTitle placeholder=Tytuł wpisu (opcjonalnie)
- textarea id=journalText placeholder=O czym dziś myślisz Co się wydarzyłotextarea
- button class=btn onclick=addJournal()Zapisz wpisbutton
- div
- h2Historia wpisówh2
- ${data.journal.map(j=`div class=carddiv class=rowb${esc(j.titleBez tytułu)}bspan class=small${dateLabel(j.date)}spandivhrdiv class=journal${esc(j.text)}divdiv style=text-alignright;margin-top10pxbutton class=btn danger smallbtn onclick=deleteJournal('${j.id}')Usuń wpisbuttondivdiv`).join()'div class=card emptyJeszcze nie ma żadnych wpisów.div'}`;
-}
-function progressPage(){
- const tasks=data.tasks;
- const done=completed(tasks);
- const total=data.goals.length;
- const achieved=data.goals.filter(g=g.done).length;
- const logs=Object.values(data.habitLogs).filter(Boolean).length;
- return `${sectionTitle(Progress,Zobacz, jak daleko już zaszedłeś)}
- div class=grid
- div class=statdiv class=smallZADANIAdivb${done}bspan class=smallWykonane łączniespandiv
- div class=statdiv class=smallCELEdivb${achieved}${total}bspan class=smallUkończonespandiv
- div class=statdiv class=smallNAWYKIdivb${logs}bspan class=smallZaznaczone dnispandiv
- div class=statdiv class=smallZADANIA ŁĄCZNIEdivb${tasks.length}bspan class=smallW planiespandiv
- div
- h2Postęp celówh2
- ${data.goals.map(g=goalCard(g)).join()'div class=card emptyBrak danych do wyświetlenia.div'}
- h2Regularność nawykówh2div class=card${data.habits.map(h=`div class=row style=padding8px 0span${esc(h.title)}spanb${Object.keys(data.habitLogs).filter(k=k.endsWith(_+h.id)&&data.habitLogs[k]).length} dnibdiv`).join()Dodaj nawyki, aby śledzić regularność.}div`;
-}
-function morePage(){
- return `${sectionTitle(More,Pozostałe moduły)}
- div class=card
- ${[habits,journal,progress,settings].map((p,i)={
- const labels=[Nawyki,Dziennik,Statystyki,Ustawienia];
- const icons=[↻,✎,▥,⚙];
- return `div class=task onclick=go('${p}') style=cursorpointerspan class=icon${icons[i]}spanb style=flex1${labels[i]}bspan→spandiv`;
- }).join()}
- div`;
-}
-function settingsPage(){
- return `${sectionTitle(Ustawienia,Twoje dane, Twoja kontrola)}
- div class=cardh2 style=margin-top0Kopia zapasowah2
- p class=smallEksportuj dane do pliku JSON. Możesz później odtworzyć je na tym samym lub innym urządzeniu.p
- button class=btn onclick=exportData()↓ Eksportuj danebutton
- hrlabelPrzywróć kopię zapasowąlabelinput type=file id=importFile accept=.json,applicationjson
- button class=btn secondary onclick=importData()Importuj danebutton
- div
- div class=cardh2 style=margin-top0Prywatnośćh2
- p class=smallWszystkie dane LIFEBOARD są zapisywane lokalnie w pamięci przeglądarki tego urządzenia. Nie wysyłamy ich na żaden serwer.p
- p class=smallWyczyszczenie danych przeglądarki może usunąć Twoje wpisy. Regularnie eksportuj kopię zapasową.p
- button class=btn danger onclick=clearData()Usuń wszystkie danebutton
- div
- div class=small style=text-aligncenter;margin25pxLIFEBOARD v1.0 · Made for yourself.div`;
-}
-function go(p){page=p;render();window.scrollTo(0,0)}
-document.getElementById(nav).addEventListener(click,e={
- const b=e.target.closest(button[data-page]);
- if(b)go(b.dataset.page);
+document.querySelectorAll(".tabs button").forEach(button => {
+  button.addEventListener("click", () => showView(button.dataset.view));
 });
-function addGoal(){
- const title=document.getElementById(goalTitle).value.trim();
- if(!title)return toast(Wpisz nazwę celu.);
- data.goals.unshift({iduid(),title,categorydocument.getElementById(goalCategory).value,deadlinedocument.getElementById(goalDate).value,descdocument.getElementById(goalDesc).value,progress0,donefalse});
- save();render();toast(Cel został dodany.);
+function openForm(id) { document.getElementById(id).classList.remove("hidden"); }
+function closeForm(id) { document.getElementById(id).classList.add("hidden"); }
+
+function addGoal() {
+  const title = document.getElementById("goalTitle").value.trim();
+  if (!title) return alert("Wpisz nazwę celu.");
+  db.goals.push({
+    id: makeId(), title,
+    category: document.getElementById("goalCategory").value,
+    date: document.getElementById("goalDate").value,
+    description: document.getElementById("goalDescription").value.trim(),
+    progress: 0, done: false, created: localDate()
+  });
+  ["goalTitle","goalDate","goalDescription"].forEach(id => document.getElementById(id).value = "");
+  closeForm("goalForm");
+  save();
 }
-function editGoal(id){
- const g=data.goals.find(x=x.id===id);if(!g)return;
- const n=prompt(Postęp celu w procentach (0–100),g.progress);
- if(n===null)return;
- const v=Number(n);
- if(!Number.isFinite(v)v0v100)return toast(Podaj liczbę od 0 do 100.);
- g.progress=Math.round(v);if(v===100)g.done=true;
- save();render();
+function changeGoalProgress(id, value) {
+  const goal = db.goals.find(g => g.id === id);
+  if (!goal) return;
+  goal.progress = Math.max(0, Math.min(100, Number(value) || 0));
+  goal.done = goal.progress === 100;
+  save();
 }
-function finishGoal(id){
- const g=data.goals.find(x=x.id===id);if(g){g.done=true;g.progress=100;save();render();toast(Cel ukończony!);}
+function editGoal(id) {
+  const goal = db.goals.find(g => g.id === id);
+  if (!goal) return;
+  const title = prompt("Nazwa celu:", goal.title);
+  if (title === null) return;
+  if (!title.trim()) return alert("Nazwa celu nie może być pusta.");
+  const description = prompt("Opis celu:", goal.description || "");
+  if (description === null) return;
+  goal.title = title.trim();
+  goal.description = description.trim();
+  save();
 }
-function addTask(type,date){
- const title=document.getElementById(taskTitle).value.trim();
- if(!title)return toast(Wpisz treść zadania.);
- data.tasks.unshift({iduid(),title,type,date,prioritydocument.getElementById(taskPriority).valueNormalny,donefalse});
- save();render();toast(Zadanie dodane.);
+function deleteGoal(id) {
+  if (!confirm("Usunąć ten cel?")) return;
+  db.goals = db.goals.filter(g => g.id !== id);
+  save();
 }
-function toggleTask(id){
- const t=data.tasks.find(x=x.id===id);if(t){t.done=!t.done;save();render();}
+
+function addTaskPrompt(type) {
+  const title = prompt(type === "daily" ? "Jakie zadanie wykonać dzisiaj?" : "Jakie zadanie zaplanować na ten tydzień?");
+  if (!title || !title.trim()) return;
+  const priority = prompt("Priorytet: wysoki / normalny / niski", "normalny");
+  db.tasks.push({
+    id: makeId(), title: title.trim(), type,
+    date: type === "daily" ? localDate() : weekStart(),
+    priority: ["wysoki","normalny","niski"].includes((priority || "").toLowerCase()) ? priority.toLowerCase() : "normalny",
+    done: false, created: localDate()
+  });
+  save();
 }
-function deleteTask(id){
- if(confirm(Usunąć to zadanie)){data.tasks=data.tasks.filter(t=t.id!==id);save();render();}
+function toggleTask(id) {
+  const task = db.tasks.find(t => t.id === id);
+  if (task) { task.done = !task.done; task.completedAt = task.done ? localDate() : ""; save(); }
 }
-function addHabit(){
- const title=document.getElementById(habitTitle).value.trim();
- if(!title)return toast(Wpisz nazwę nawyku.);
- data.habits.push({iduid(),title});save();render();toast(Nawyk dodany.);
+function editTask(id) {
+  const task = db.tasks.find(t => t.id === id);
+  if (!task) return;
+  const title = prompt("Edytuj zadanie:", task.title);
+  if (title === null || !title.trim()) return;
+  task.title = title.trim();
+  save();
 }
-function toggleHabit(id){
- const key=today()+_+id;
- if(data.habitLogs[key])delete data.habitLogs[key];
- else data.habitLogs[key]=true;
- save();render();
+function deleteTask(id) {
+  if (!confirm("Usunąć to zadanie?")) return;
+  db.tasks = db.tasks.filter(t => t.id !== id);
+  save();
 }
-function deleteHabit(id){
- if(confirm(Usunąć ten nawyk)){
- data.habits=data.habits.filter(h=h.id!==id);
- Object.keys(data.habitLogs).forEach(k={if(k.endsWith(_+id))delete data.habitLogs[k]});
- save();render();
- }
+function taskHTML(task) {
+  const priorityClass = task.priority === "wysoki" ? "red" : task.priority === "niski" ? "muted" : "yellow";
+  return `<div class="item ${task.done ? "done" : ""}">
+    <div class="item-main">
+      <div class="checkline"><input type="checkbox" ${task.done ? "checked" : ""} onchange="toggleTask('${task.id}')"><span class="item-title">${escapeHTML(task.title)}</span></div>
+      <div class="item-meta"><span class="${priorityClass}">${escapeHTML(task.priority || "normalny")}</span> · ${task.done ? "Wykonane" : "Do zrobienia"}</div>
+    </div>
+    <div class="item-actions"><button class="icon-btn" onclick="editTask('${task.id}')">✎</button><button class="icon-btn" onclick="deleteTask('${task.id}')">×</button></div>
+  </div>`;
 }
-function addJournal(){
- const text=document.getElementById(journalText).value.trim();
- if(!text)return toast(Wpis jest pusty.);
- data.journal.unshift({iduid(),titledocument.getElementById(journalTitle).value.trim(),text,datetoday()});
- save();render();toast(Wpis zapisany.);
+
+function addHabitPrompt() {
+  const name = prompt("Nazwa nawyku:", "Czytanie 15 minut");
+  if (!name || !name.trim()) return;
+  db.habits.push({ id: makeId(), name: name.trim(), created: localDate() });
+  save();
 }
-function deleteJournal(id){
- if(confirm(Usunąć wpis)){data.journal=data.journal.filter(j=j.id!==id);save();render();}
+function toggleHabit(id) {
+  const date = localDate();
+  if (!db.habitLogs[date]) db.habitLogs[date] = [];
+  const logs = db.habitLogs[date];
+  db.habitLogs[date] = logs.includes(id) ? logs.filter(x => x !== id) : [...logs, id];
+  save();
 }
-function exportData(){
- const blob=new Blob([JSON.stringify(data,null,2)],{typeapplicationjson});
- const url=URL.createObjectURL(blob);
- const a=document.createElement(a);a.href=url;a.download=LIFEBOARD-backup-+today()+.json;a.click();
- URL.revokeObjectURL(url);toast(Kopia zapasowa gotowa.);
+function deleteHabit(id) {
+  if (!confirm("Usunąć ten nawyk i jego historię?")) return;
+  db.habits = db.habits.filter(h => h.id !== id);
+  Object.keys(db.habitLogs).forEach(date => {
+    db.habitLogs[date] = db.habitLogs[date].filter(x => x !== id);
+  });
+  save();
 }
-function importData(){
- const file=document.getElementById(importFile).files[0];
- if(!file)return toast(Wybierz plik kopii zapasowej.);
- const reader=new FileReader();
- reader.onload=()={
- try{
- const x=JSON.parse(reader.result);
- if(!x.goals!x.tasks!x.habits!x.journal!x.habitLogs)throw Error();
- if(!confirm(Import zastąpi aktualne dane. Kontynuować))return;
- data=x;save();render();toast(Dane przywrócone.);
- }catch(e){toast(Nieprawidłowy plik kopii zapasowej.);}
- };
- reader.readAsText(file);
+function habitStreak(id) {
+  let count = 0;
+  const d = new Date();
+  if (!(db.habitLogs[localDate()] || []).includes(id)) d.setDate(d.getDate() - 1);
+  for (let i = 0; i < 366; i++) {
+    if ((db.habitLogs[localDate(d)] || []).includes(id)) {
+      count++;
+      d.setDate(d.getDate() - 1);
+    } else break;
+  }
+  return count;
 }
-function clearData(){
- if(!confirm(Na pewno usunąć WSZYSTKIE dane LIFEBOARD))return;
- if(!confirm(Ostatnie potwierdzenie. Tej operacji nie można cofnąć.))return;
- data={...initial,goals[],tasks[],habits[],journal[],habitLogs{}};
- save();render();toast(Dane usunięte.);
+function habitHTML(habit, compact = false) {
+  const done = (db.habitLogs[localDate()] || []).includes(habit.id);
+  return `<div class="item ${done ? "done" : ""}">
+    <div class="item-main">
+      <div class="checkline"><input type="checkbox" ${done ? "checked" : ""} onchange="toggleHabit('${habit.id}')"><span class="item-title">${escapeHTML(habit.name)}</span></div>
+      <div class="item-meta">${habitStreak(habit.id)} dni z rzędu</div>
+    </div>
+    ${compact ? "" : `<button class="icon-btn" onclick="deleteHabit('${habit.id}')">×</button>`}
+  </div>`;
 }
-if(serviceWorker in navigator && location.protocol.startsWith(http)){
- navigator.serviceWorker.register(.sw.js).catch(()={});
+
+function addJournal() {
+  const text = document.getElementById("journalText").value.trim();
+  if (!text) return alert("Wpisz treść notatki.");
+  db.journal.unshift({
+    id: makeId(), date: localDate(),
+    mood: document.getElementById("journalMood").value, text
+  });
+  document.getElementById("journalText").value = "";
+  save();
 }
-render();
-script
-body
-html
+function deleteJournal(id) {
+  if (!confirm("Usunąć ten wpis?")) return;
+  db.journal = db.journal.filter(j => j.id !== id);
+  save();
+}
+
+function renderTasks() {
+  const todayTasks = db.tasks.filter(t => t.type === "daily" && t.date === localDate());
+  const weekTasks = db.tasks.filter(t => t.type === "weekly" && t.date === weekStart());
+  const renderList = (items, id, emptyText) => {
+    document.getElementById(id).innerHTML = items.length ? items.map(taskHTML).join("") : `<div class="empty">${emptyText}</div>`;
+  };
+  renderList(todayTasks, "dailyList", "Brak zadań na dziś. Dodaj pierwsze.");
+  renderList(weekTasks, "weeklyList", "Brak zadań na ten tydzień.");
+  renderList(todayTasks.slice(0, 5), "homeTasks", "Na dziś nie masz jeszcze zadań.");
+  const done = todayTasks.filter(t => t.done).length;
+  document.getElementById("dailyCount").textContent = `${done}/${todayTasks.length}`;
+  document.getElementById("dailyProgress").textContent = `${done} z ${todayTasks.length} wykonanych`;
+  document.getElementById("dailyDate").textContent = new Date().toLocaleDateString("pl-PL", { weekday:"long", day:"numeric", month:"long" });
+  const start = new Date(weekStart() + "T12:00:00");
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  document.getElementById("weekDate").textContent = `${start.toLocaleDateString("pl-PL")} – ${end.toLocaleDateString("pl-PL")}`;
+}
+function renderGoals() {
+  const html = goal => `<div class="card" style="margin-bottom:12px">
+    <div class="topline"><div><h3>${escapeHTML(goal.title)}</h3><span class="badge">${escapeHTML(goal.category || "Inne")}</span></div>
+      <span class="green">${goal.progress || 0}%</span>
+    </div>
+    ${goal.description ? `<p class="muted small">${escapeHTML(goal.description)}</p>` : ""}
+    <div class="progress"><div style="width:${Math.max(0,Math.min(100,goal.progress || 0))}%"></div></div>
+    <div class="item-meta">${goal.date ? "Termin: " + escapeHTML(goal.date) : "Bez terminu"} ${goal.done ? " · Ukończony" : ""}</div>
+    <label>Postęp: <strong>${goal.progress || 0}%</strong><input type="range" min="0" max="100" step="5" value="${goal.progress || 0}" oninput="this.previousElementSibling.querySelector('strong').textContent=this.value+'%'" onchange="changeGoalProgress('${goal.id}',this.value)"></label>
+    <div class="actions"><button class="btn secondary smallbtn" onclick="editGoal('${goal.id}')">Edytuj</button><button class="btn danger smallbtn" onclick="deleteGoal('${goal.id}')">Usuń</button></div>
+  </div>`;
+  document.getElementById("goalsList").innerHTML = db.goals.length ? db.goals.map(html).join("") : `<div class="card empty">Nie masz jeszcze celów. Dodaj pierwszy i nadaj kierunek swoim działaniom.</div>`;
+  document.getElementById("homeGoals").innerHTML = db.goals.length ? db.goals.slice(0,3).map(g => `<div class="item"><div class="item-main"><div class="item-title">${escapeHTML(g.title)}</div><div class="progress"><div style="width:${g.progress || 0}%"></div></div><div class="item-meta">${g.progress || 0}% realizacji</div></div></div>`).join("") : `<div class="empty">Twoje cele pojawią się tutaj.</div>`;
+}
+function renderHabits() {
+  document.getElementById("habitsList").innerHTML = db.habits.length ? `<div class="card">${db.habits.map(h => habitHTML(h)).join("")}</div>` : `<div class="card empty">Nie masz jeszcze nawyków. Dodaj te, które chcesz rozwijać.</div>`;
+  document.getElementById("homeHabits").innerHTML = db.habits.length ? db.habits.slice(0,4).map(h => habitHTML(h,true)).join("") : `<div class="empty">Dodaj nawyk, aby śledzić regularność.</div>`;
+}
+function renderJournal() {
+  document.getElementById("journalList").innerHTML = db.journal.length ? db.journal.map(j => `<div class="card" style="margin-bottom:10px">
+    <div class="topline"><strong>${escapeHTML(j.mood)} ${escapeHTML(j.date)}</strong><button class="icon-btn" onclick="deleteJournal('${j.id}')">×</button></div>
+    <p style="white-space:pre-wrap;overflow-wrap:anywhere">${escapeHTML(j.text)}</p>
+  </div>`).join("") : `<div class="card empty">Twój pierwszy wpis może zacząć się od jednego zdania.</div>`;
+}
+function statCard(label, value, color) {
+  return `<div class="card kpi"><div class="muted small">${label}</div><div class="number ${color}">${value}</div></div>`;
+}
+function renderStats() {
+  const activeGoals = db.goals.filter(g => !g.done).length;
+  const doneGoals = db.goals.filter(g => g.done || g.progress === 100).length;
+  const today = db.tasks.filter(t => t.type === "daily" && t.date === localDate());
+  const completed = today.filter(t => t.done).length;
+  document.getElementById("homeStats").innerHTML =
+    statCard("AKTYWNE CELE", activeGoals, "green") +
+    statCard("WYKONANE DZIŚ", `${completed}/${today.length}`, "blue") +
+    statCard("NAWYKI", db.habits.length, "purple");
+  document.getElementById("progressStats").innerHTML =
+    statCard("WSZYSTKIE CELE", db.goals.length, "green") +
+    statCard("UKOŃCZONE CELE", doneGoals, "blue") +
+    statCard("WPISY W DZIENNIKU", db.journal.length, "purple");
+  const totalTasks = db.tasks.length;
+  const doneTasks = db.tasks.filter(t => t.done).length;
+  const taskPercent = totalTasks ? Math.round(doneTasks / totalTasks * 100) : 0;
+  document.getElementById("taskProgress").innerHTML = `<strong>${doneTasks} / ${totalTasks}</strong><span class="muted small"> zadań wykonanych (${taskPercent}%)</span><div class="progress"><div style="width:${taskPercent}%"></div></div>`;
+  let checks = 0, possible = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = localDate(d);
+    possible += db.habits.length;
+    checks += (db.habitLogs[key] || []).length;
+  }
+  const habitPercent = possible ? Math.round(checks / possible * 100) : 0;
+  document.getElementById("habitProgress").innerHTML = `<strong>${checks} / ${possible}</strong><span class="muted small"> wykonanych nawyków z ostatnich 7 dni (${habitPercent}%)</span><div class="progress"><div style="width:${habitPercent}%"></div></div>`;
+  document.getElementById("goalProgress").innerHTML = db.goals.length ? db.goals.map(g => `<div class="item"><div class="item-main"><strong>${escapeHTML(g.title)}</strong><div class="progress"><div style="width:${g.progress || 0}%"></div></div></div><span class="green">${g.progress || 0}%</span></div>`).join("") : `<div class="empty">Brak celów do podsumowania.</div>`;
+}
+function renderAll() {
+  const now = new Date();
+  document.getElementById("todayLabel").textContent = now.toLocaleDateString("pl-PL", { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+  document.getElementById("greeting").textContent = now.getHours() < 12 ? "DOBREGO PORANKA" : now.getHours() < 18 ? "DOBREGO DNIA" : "DOBREGO WIECZORU";
+  renderTasks();
+  renderGoals();
+  renderHabits();
+  renderJournal();
+  renderStats();
+}
+function exportData() {
+  const blob = new Blob([JSON.stringify({ ...db, exportedAt: new Date().toISOString() }, null, 2)], { type:"application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `lifeboard-backup-${localDate()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function importData(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!data || !Array.isArray(data.goals) || !Array.isArray(data.tasks) || !Array.isArray(data.habits) || !Array.isArray(data.journal)) throw new Error("Nieprawidłowy plik");
+      if (!confirm("Import zastąpi obecne dane. Czy kontynuować?")) return;
+      db = {
+        goals: data.goals,
+        tasks: data.tasks,
+        habits: data.habits,
+        habitLogs: data.habitLogs || {},
+        journal: data.journal
+      };
+      save();
+      alert("Dane zostały zaimportowane.");
+    } catch (e) {
+      alert("Nie udało się zaimportować pliku. Upewnij się, że to kopia LIFEBOARD w formacie JSON.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.readAsText(file);
+}
+function clearData() {
+  if (!confirm("Czy na pewno usunąć WSZYSTKIE cele, zadania, nawyki i wpisy? Tej operacji nie można cofnąć. Najpierw wykonaj kopię zapasową.")) return;
+  db = { goals: [], tasks: [], habits: [], habitLogs: {}, journal: [] };
+  save();
+}
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(error => console.error("Service Worker:", error));
+  });
+}
+renderAll();
+</script>
+</body>
+</html>
